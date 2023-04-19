@@ -12,6 +12,8 @@
     <module>jms-fundamentals</module>
     <module>p2p</module>
     <module>pubsub</module>
+      <module>messagefiltering</module>
+    <module>guranteedmessaging</module>
   </modules>
 
   <properties>

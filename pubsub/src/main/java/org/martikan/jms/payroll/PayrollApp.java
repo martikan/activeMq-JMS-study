@@ -1,4 +1,4 @@
-package org.martikan.jms.security;
+package org.martikan.jms.payroll;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.martikan.jms.hr.model.Employee;
@@ -9,7 +9,7 @@ import javax.jms.Topic;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-public class SecurityApp {
+public class PayrollApp {
 
     public static void main(String[] args) throws NamingException, JMSException {
 

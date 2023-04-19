@@ -1,16 +1,17 @@
-package org.martikan.jms.hr;
+package org.martikan.jms.security;
 
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.martikan.jms.hr.model.Employee;
 
 import javax.jms.JMSContext;
+import javax.jms.JMSException;
 import javax.jms.Topic;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-public class HRApp {
+public class SecurityApp {
 
-    public static void main(String[] args) throws NamingException {
+    public static void main(String[] args) throws NamingException, JMSException, InterruptedException {
 
         final var ctx = new InitialContext();
 
@@ -18,18 +19,21 @@ public class HRApp {
 
         try (ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory();
              JMSContext jmsContext = cf.createContext()) {
-            final var producer = jmsContext.createProducer();
+            jmsContext.setClientID("security-app");
 
-            final var employee = new Employee();
-            employee.setId(123);
-            employee.setFirstName("John");
-            employee.setLastName("Doe");
-            employee.setEmail("j.doe@gmail.com");
-            employee.setDesignation("Software engineer");
-            employee.setPhone("+363012345522");
+            final var consumerDead = jmsContext.createDurableConsumer(empTopic, "subscription1");
+            consumerDead.close(); Thread.sleep(10000); // Simulate the server down.
 
-            producer.send(empTopic, employee);
-            System.out.println("Message sent");
+            final var consumerRestarted = jmsContext.createDurableConsumer(empTopic, "subscription1");
+
+            final var message = consumerRestarted.receive();
+
+            final var employee = message.getBody(Employee.class);
+
+            System.out.println(employee.getEmail());
+
+            consumerRestarted.close();
+            jmsContext.unsubscribe("subscription1");
         }
     }
 
